@@ -54,6 +54,15 @@ const init = () => {
     visible: false,
   });
   map.addLayer(tileDebugLayer);
+
+  //stamen
+  // @reference maps.stamen.com
+  const stamenLayer = new ol.layer.Tile({
+    source: new ol.source.Stamen({
+      layer: "watercolor",
+    }),
+  });
+  map.addLayer(stamenLayer);
 };
 
 window.onload = init;
