@@ -44,7 +44,7 @@ const init = () => {
     source: new ol.source.XYZ({
       url: "https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png",
     }),
-    visible: true,
+    visible: false,
   });
   map.addLayer(cartoDBBaseLayer);
 
@@ -63,6 +63,22 @@ const init = () => {
     }),
   });
   map.addLayer(stamenLayer);
+
+  // Tile Arc
+  // @reference https://openlayers.org/en/latest/apidoc/module-ol_source_TileArcGISRest-TileArcGISRest.html
+  // @reference http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer
+  // @reference https://www.esri.com/en-us/home
+  const tileArcGisRestLayer = new ol.layer.Tile({
+    source: new ol.source.TileArcGISRest({
+      url: "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer",
+      visible: true,
+    }),
+  });
+  map.addLayer(tileArcGisRestLayer);
+
+  // Tilewms
+  // @refenrence https://www.ogc.org/event
+  // @reference https://www.noaa.gov/ for layer
 };
 
 window.onload = init;
