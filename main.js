@@ -1,41 +1,44 @@
 const init = () => {
+  const attributionControl = new ol.control.Attribution({
+    collapsible: true,
+  });
   const map = new ol.Map({
     target: "map",
-    layers: [
-      new ol.layer.Tile({
-        source: new ol.source.OSM(),
-        zIndex: 1,
-        visible: false,
-      }),
-    ],
     view: new ol.View({
       center: [0, 0],
       zoom: 3,
     }),
+    controls: ol.control
+      .defaults({ attribution: false })
+      .extend([attributionControl]),
   });
 
-  // Layer group
-  const layerGroup = new ol.layer.Group({
-    layers: [
-      new ol.layer.Tile({
-        source: new ol.source.OSM({
-          url: "https://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-        }),
-        zIndex: 0,
-        visible: false,
-      }),
-      // Bing maps layer
-      new ol.layer.Tile({
-        source: new ol.source.BingMaps({
-          key: "ApLmsAhD2fRQfMRDbtpyXH89Au9WMjdZQ34ySMNiwptesntOrDVATuH5hC45KXk6",
-          imagerySet: "Road",
-        }),
-        zIndex: 2,
-      }),
-    ],
+  // Base Layer
+  // Openstreet Map Standar
+  const openStreetMapStandardLayer = new ol.layer.Tile({
+    source: new ol.source.OSM(),
+    visible: false,
+    title: "OSMStandard",
   });
 
-  // map.addLayer(layerGroup);
+  //humanitarian
+  const openStreetMapHumanitarian = new ol.layer.Tile({
+    source: new ol.source.OSM({
+      url: "https://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+    }),
+    visible: false,
+    title: "OSMHumanitarian",
+  });
+
+  // Bing maps layer
+  const bingmaps = new ol.layer.Tile({
+    source: new ol.source.BingMaps({
+      key: "ApLmsAhD2fRQfMRDbtpyXH89Au9WMjdZQ34ySMNiwptesntOrDVATuH5hC45KXk6",
+      imagerySet: "Road",
+    }),
+    visible: false,
+    title: "BingMaps",
+  });
 
   // cartodb
   // provider carto.com
@@ -45,15 +48,8 @@ const init = () => {
       url: "https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png",
     }),
     visible: false,
+    title: "CartoDarkAll",
   });
-  map.addLayer(cartoDBBaseLayer);
-
-  // TileDebug
-  const tileDebugLayer = new ol.layer.Tile({
-    source: new ol.source.TileDebug(),
-    visible: false,
-  });
-  map.addLayer(tileDebugLayer);
 
   //stamen
   // @reference maps.stamen.com
@@ -61,8 +57,58 @@ const init = () => {
     source: new ol.source.Stamen({
       layer: "watercolor",
     }),
+    visible: false,
+    title: "StamenTerrain",
   });
-  map.addLayer(stamenLayer);
+
+  // Base vector layers
+  // Vector tile layer open street map
+  const openStreetMapVectorTile = new ol.layer.VectorTile({
+    source: new ol.source.VectorTile({
+      url: "https://api.maptiler.com/tiles/v3-openmaptiles/{z}/{x}/{y}.pbf?key=1osjkWprx6Puy9Pnocom",
+      format: new ol.format.MVT(),
+      attributions:
+        '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+    }),
+    visible: true,
+  });
+
+  map.addLayer(openStreetMapVectorTile);
+
+  // Layer group
+  const baseLayerGroup = new ol.layer.Group({
+    layers: [
+      openStreetMapStandardLayer,
+      openStreetMapHumanitarian,
+      bingmaps,
+      cartoDBBaseLayer,
+      stamenLayer,
+    ],
+  });
+
+  map.addLayer(baseLayerGroup);
+
+  // switch layers
+  const baseLayerElements = document.querySelectorAll(
+    ".sidebar > input[type=radio]"
+  );
+  for (let baseLayerElement of baseLayerElements) {
+    baseLayerElement.addEventListener("change", (e) => {
+      const { value } = e.target;
+      baseLayerGroup.getLayers().forEach(function (element, index, array) {
+        let baseLayerName = element.get("title");
+        element.setVisible(baseLayerName === value);
+      });
+    });
+  }
+
+  // TileDebug
+  /*
+  const tileDebugLayer = new ol.layer.Tile({
+    source: new ol.source.TileDebug(),
+  });
+  map.addLayer(tileDebugLayer);
+  */
 
   // Tile Arc
   // @reference https://openlayers.org/en/latest/apidoc/module-ol_source_TileArcGISRest-TileArcGISRest.html
@@ -71,14 +117,18 @@ const init = () => {
   const tileArcGisRestLayer = new ol.layer.Tile({
     source: new ol.source.TileArcGISRest({
       url: "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer",
-      visible: true,
     }),
+    visible: false,
+    title: "TileArcGISLayer",
   });
   map.addLayer(tileArcGisRestLayer);
 
-  // Tilewms
-  // @refenrence https://www.ogc.org/event
-  // @reference https://www.noaa.gov/ for layer
+  const rasterLayers = document.querySelector(
+    ".sidebar > input[type='checkbox']"
+  );
+  rasterLayers.addEventListener("change", (e) => {
+    tileArcGisRestLayer.setVisible(e.target.checked);
+  });
 };
 
 window.onload = init;

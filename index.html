@@ -13,10 +13,48 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <div id="popupContainer">
-      <p id="popupCoord"></p>
+    <div class="grid-container">
+      <div class="grid-1">
+        <div class="sidebar">
+          <h2>Base Layers</h2>
+          <input
+            type="radio"
+            name="baseLayerRadioButton"
+            value="OSMStandard"
+            checked
+          />OSM Standard<br />
+          <input
+            type="radio"
+            name="baseLayerRadioButton"
+            value="OSMHumanitarian"
+          />OSM Humanitarian<br />
+          <input
+            type="radio"
+            name="baseLayerRadioButton"
+            value="BingMaps"
+          />Bing Maps<br />
+          <input
+            type="radio"
+            name="baseLayerRadioButton"
+            value="CartoDarkAll"
+          />Carto Dark All<br />
+          <input
+            type="radio"
+            name="baseLayerRadioButton"
+            value="StamenTerrain"
+          />Stamen Terrain<br />
+          <h2>Layers</h2>
+          <input
+            type="checkbox"
+            name="rasterTileLayerCheckbox"
+            value="TileArcGISLayer"
+          />Tile ArcGIS Layer
+        </div>
+      </div>
+      <div class="grid-2">
+        <div id="map"></div>
+      </div>
     </div>
-    <div id="map"></div>
     <script src="./main.js"></script>
   </body>
 </html>
